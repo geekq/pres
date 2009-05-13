@@ -163,7 +163,12 @@ def transform(string):
     _string = p.sub(r"\\alert{\1}", _string) 
 
     # colors
-    p = re.compile("_([^_\\\\]*?)_([^_]*?[^_\\\\])_", re.VERBOSE)
+    # change by vd: require at least one white space character after the
+    # second underscore, otherwise a source code example like
+    # alias :method_missing_before_workflow :method_missing
+    # is converted to
+    # alias :method\textcolor{missing}{before}workflow ...
+    p = re.compile("_([^_\\\\]*?)_\s+([^_]*?[^_\\\\])_", re.VERBOSE)
     _string = p.sub(r"\\textcolor{\1}{\2}", _string) 
 
     # footnotes
