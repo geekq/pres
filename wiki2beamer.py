@@ -95,7 +95,7 @@ def transform(string):
     if (frame_opened == 0):
         _string = p.sub(r"\\begin{frame}\2\n \\frametitle{\1}\n <---FRAMEHEADER---> \n", string)
     else:
-        _string = p.sub(r" <---FRAMEFOOTER---> \n \\end{frame}\n\n\\begin{frame}\2\n \\frametitle{\1}\n <---FRAMEHEADER---> \n", string)
+        _string = p.sub(r" <---FRAMEFOOTER---> \n\\end{frame}\n\n\\begin{frame}\2\n \\frametitle{\1}\n <---FRAMEHEADER---> \n", string)
     if (string != _string):
         frame_opened = 1
 
@@ -104,7 +104,7 @@ def transform(string):
     string = _string
     p = re.compile("^===\s*(.*?)\s*===(.*)", re.VERBOSE)
     if (frame_opened == 1):
-        _string = p.sub(r" <---FRAMEFOOTER---> \n \\end{frame}\n\\subsection\2{\1}\n\n", string)
+        _string = p.sub(r" <---FRAMEFOOTER---> \n\\end{frame}\n\\subsection\2{\1}\n\n", string)
     else:
         _string = p.sub(r"\n\\subsection\2{\1}\n\n", string)
     if (string != _string):
@@ -114,7 +114,7 @@ def transform(string):
     string = _string
     p = re.compile("^==\s*(.*?)\s*==(.*)", re.VERBOSE)
     if (frame_opened == 1):
-        _string = p.sub(r" <---FRAMEFOOTER---> \n \\end{frame}\n\n\\section\2{\1}\n\n", string)
+        _string = p.sub(r" <---FRAMEFOOTER---> \n\\end{frame}\n\n\\section\2{\1}\n\n", string)
     else:
         _string = p.sub(r"\n\n\\section\2{\1}\n\n", string)
     if (string != _string):
@@ -243,7 +243,7 @@ def convert2beamer(filename):
     result.append(transform(""))   # close open environments
 
     if (frame_opened == 1):
-        _string = "<---FRAMEFOOTER---> \n \\end{frame}\n"
+        _string = "<---FRAMEFOOTER---> \n\\end{frame}\n"
         _string = _string.replace("<---FRAMEFOOTER--->", frame_footer)
         result.append(_string)
 
