@@ -1,0 +1,75 @@
+#!/usr/bin/rake -f 
+# vim: set ft=ruby
+task :default => [:help]
+
+def src_file
+  fail "Please provide src= param on the command line with the 
+  markdown file containing the presentation content" unless ENV['src']
+  ENV['src']
+end
+
+def pres_dir
+  File.dirname(src_file)
+end
+
+def pdf_file
+  File.join '/tmp/', File.basename(src_file, File.extname(src_file)) + '.pdf'
+end
+
+def content_tex_file
+  File.join '/tmp/', File.basename(src_file, File.extname(src_file)) + '_content.tex'
+end
+
+def main_tex_file_src
+  File.join File.dirname(src_file), File.basename(src_file, File.extname(src_file)) + '_main.tex'
+end
+
+def main_tex_file_target
+  File.join '/tmp/', File.basename(src_file, File.extname(src_file)) + '.tex'
+end
+
+def file_to_show
+  File.join(pres_dir, File.basename(pdf_file))
+end
+
+desc "Show usage information"
+task :help do
+  puts "
+USAGE EXAMPLES
+
+Build the presentation:
+    src=VortragTestDrivenJS.markdown pres build
+Set the resolution and run:
+    src=VortragTestDrivenJS.markdown pres res run
+"
+end
+
+desc "Set the resolution for the beamer"
+task :res do 
+  sh '/home/vd/projects/impressive/setres.sh'
+end
+
+desc "Run the presentation"
+task :run do
+  sh "/home/vd/projects/impressive/impressive.py -t None --dual-head 1024x768+1280+31,1280x800+0+0 #{file_to_show}"
+end
+
+desc "Compile from markdown to pdf"
+task :build do
+  sh "cp #{main_tex_file_src} #{main_tex_file_target}"
+  sh "cp -r img /tmp/"
+  sh "/home/vd/var/wiki2beamer/wiki2beamer.py #{src_file} > #{content_tex_file}"
+  puts "pdflatex -interaction=batchmode #{main_tex_file_target}"
+  system "cd /tmp;pdflatex -interaction=batchmode #{main_tex_file_target}"
+  sh "mv #{pdf_file} #{pres_dir}/"
+end
+
+desc "Open pdf file in Acrobat Reader"
+task :open_pdf do
+  sh 'acroread MetaProgrammingHarmful.pdf &'
+end
+
+desc "Reopen pdf file in evince"
+task :reopen_pdf do
+  sh "evince #{file_to_show} &"
+end
