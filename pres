@@ -1,5 +1,10 @@
 #!/usr/bin/rake -f 
 # vim: set ft=ruby
+
+# on Ubuntu install
+# sudo aptitude install texlive-fonts-recommended
+require 'pathname'
+
 task :default => [:help]
 
 def src_file
@@ -54,11 +59,14 @@ task :run do
   sh "/home/vd/projects/impressive/impressive.py -t None --dual-head 1024x768+1280+31,1280x800+0+0 #{file_to_show}"
 end
 
+wiki2beamer = File.join(File.dirname(Pathname.new(__FILE__).realpath), 
+  "wiki2beamer", "wiki2beamer.py")
+
 desc "Compile from markdown to pdf"
 task :build do
   sh "cp #{main_tex_file_src} #{main_tex_file_target}"
   sh "cp -r img /tmp/"
-  sh "/home/vd/var/wiki2beamer/wiki2beamer.py #{src_file} > #{content_tex_file}"
+  sh "#{wiki2beamer} #{src_file} > #{content_tex_file}"
   puts "pdflatex -interaction=batchmode #{main_tex_file_target}"
   system "cd /tmp;pdflatex -interaction=batchmode #{main_tex_file_target}"
   sh "mv #{pdf_file} #{pres_dir}/"
@@ -66,7 +74,7 @@ end
 
 desc "Open pdf file in Acrobat Reader"
 task :open_pdf do
-  sh 'acroread MetaProgrammingHarmful.pdf &'
+  sh "evince #{pres_dir}/#{File.basename(pdf_file)} &"
 end
 
 desc "Reopen pdf file in evince"
